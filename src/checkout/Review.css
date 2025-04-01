@@ -1,0 +1,169 @@
+.receipt-card {
+  margin: 16px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.receipt-title {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.receipt-title h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.receipt-totals {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #eee;
+}
+
+.receipt-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  color: #666;
+}
+
+.receipt-row.total {
+  font-weight: 600;
+  color: #333;
+  font-size: 1.1rem;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #eee;
+}
+
+.payment-method {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #eee;
+}
+
+.payment-method h3 {
+  margin: 0 0 8px 0;
+  color: #333;
+}
+
+.payment-method p {
+  margin: 0;
+  color: #666;
+}
+
+.qr-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  text-align: center;
+}
+
+.qr-code-image {
+  width: 250px;
+  height: 250px;
+  margin: 20px auto;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.qr-container ion-text {
+  margin: 16px 0;
+}
+
+.qr-container ion-text p {
+  margin: 8px 0;
+  color: var(--ion-color-dark);
+}
+
+.qr-container ion-item {
+  width: 100%;
+  max-width: 400px;
+  margin: 16px 0;
+  --background: var(--ion-color-light);
+  --border-radius: 8px;
+}
+
+.submit-reference-button {
+  margin-top: 16px;
+  width: 100%;
+  max-width: 400px;
+}
+
+/* Review page styles */
+.review-container {
+  padding: 16px;
+}
+
+.order-summary-card {
+  margin-bottom: 16px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.order-total {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--ion-color-light);
+  text-align: right;
+}
+
+.order-total h2 {
+  color: var(--ion-color-dark);
+  font-size: 1.2rem;
+  margin: 0;
+}
+
+/* Footer Styles */
+.product-footer {
+  background: var(--ion-color-light);
+  padding: 0;
+}
+
+.footer-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 16px;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.footer-back-action-button-container,
+.footer-action-button-container {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.footer-back-action-button {
+  --padding-start: 16px;
+  --padding-end: 16px;
+}
+
+.footer-action-button {
+  --padding-start: 16px;
+  --padding-end: 16px;
+  --background: var(--ion-color-primary);
+  --color: var(--ion-color-primary-contrast);
+}
+
+/* Modal Styles */
+ion-modal {
+  --height: auto;
+  --width: 90%;
+  --max-width: 400px;
+  --border-radius: 8px;
+}
+
+ion-modal ion-header {
+  box-shadow: none;
+}
+
+ion-modal ion-content {
+  --padding: 20px;
+}
