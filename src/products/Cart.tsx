@@ -233,7 +233,11 @@ const Cart: React.FC<CartProps> = ({ showToastMessage }) => {
           <div className="empty-cart-container">
             <IonTitle>Your cart is empty</IonTitle>
             <IonText>Looks like you haven't added any items yet.</IonText>
-            <IonButton expand="block" color="primary">
+            <IonButton 
+              expand="block" 
+              color="primary"
+              onClick={() => history.push('/home')}
+            >
               Start Shopping
             </IonButton>
           </div>

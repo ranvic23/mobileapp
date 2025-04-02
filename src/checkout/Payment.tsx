@@ -48,7 +48,7 @@ import {
   qrCodeOutline,
   cameraOutline,
 } from "ionicons/icons";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./Payment.css";
 import CheckoutStepProgress from "../components/CheckoutStepProgress";
@@ -57,7 +57,6 @@ import { useHistory } from "react-router";
 const Payment: React.FC = () => {
   const history = useHistory();
   const [paymentMethod, setPaymentMethod] = useState("cash");
-  const [showQRCode, setShowQRCode] = useState(false);
   const [referenceNumber, setReferenceNumber] = useState("");
 
   const steps = [
@@ -68,12 +67,24 @@ const Payment: React.FC = () => {
 
   const currentStep = steps.indexOf(history.location.pathname);
 
+  useEffect(() => {
+    // Load saved payment method on component mount
+    const savedMethod = localStorage.getItem("selectedPaymentMethod");
+    if (savedMethod) {
+      setPaymentMethod(savedMethod);
+    }
+  }, []);
+
   const handlePaymentMethodChange = (value: string) => {
     setPaymentMethod(value);
     localStorage.setItem("selectedPaymentMethod", value);
   };
 
   const handleContinue = () => {
+    if (!paymentMethod) {
+      return;
+    }
+    localStorage.setItem("selectedPaymentMethod", paymentMethod);
     history.push("/home/cart/schedule/payment/review");
   };
 
@@ -81,6 +92,9 @@ const Payment: React.FC = () => {
     <IonPage>
       <IonHeader>
         <IonToolbar>
+          <IonButtons slot="start">
+            <IonBackButton defaultHref="/home/cart/schedule" />
+          </IonButtons>
           <IonTitle className="title-toolbar">Payment Method</IonTitle>
         </IonToolbar>
       </IonHeader>
@@ -89,62 +103,29 @@ const Payment: React.FC = () => {
 
         <IonCard className="payment-methods-card">
           <IonCardContent>
-            <IonList>
-              <IonItem button detail={false} onClick={() => handlePaymentMethodChange("cash")}>
-                <IonIcon icon={cashOutline} slot="start" />
-                <IonLabel>
-                  <h2>Cash on Pickup</h2>
-                  <p>Pay when you pick up your order</p>
-                </IonLabel>
-                <IonRadio slot="end" value="cash" checked={paymentMethod === "cash"} />
-              </IonItem>
+            <IonRadioGroup value={paymentMethod} onIonChange={e => handlePaymentMethodChange(e.detail.value)}>
+              <IonList>
+                <IonItem button lines="full" onClick={() => handlePaymentMethodChange("cash")}>
+                  <IonIcon icon={cashOutline} slot="start" color={paymentMethod === "cash" ? "primary" : "medium"} />
+                  <IonLabel>
+                    <h2>Cash on Pickup</h2>
+                    <p>Pay when you pick up your order</p>
+                  </IonLabel>
+                  <IonRadio slot="end" value="cash" />
+                </IonItem>
 
-              <IonItem button detail={false} onClick={() => handlePaymentMethodChange("gcash")}>
-                <IonIcon icon={cardOutline} slot="start" />
-                <IonLabel>
-                  <h2>GCash</h2>
-                  <p>Pay using GCash QR code</p>
-                </IonLabel>
-                <IonRadio slot="end" value="gcash" checked={paymentMethod === "gcash"} />
-              </IonItem>
-            </IonList>
+                <IonItem button lines="full" onClick={() => handlePaymentMethodChange("gcash")}>
+                  <IonIcon icon={cardOutline} slot="start" color={paymentMethod === "gcash" ? "primary" : "medium"} />
+                  <IonLabel>
+                    <h2>GCash</h2>
+                    <p>Pay using GCash QR code</p>
+                  </IonLabel>
+                  <IonRadio slot="end" value="gcash" />
+                </IonItem>
+              </IonList>
+            </IonRadioGroup>
           </IonCardContent>
         </IonCard>
-
-        {/* GCash QR Code Modal */}
-        <IonModal isOpen={showQRCode} onDidDismiss={() => setShowQRCode(false)}>
-          <IonHeader>
-            <IonToolbar>
-              <IonTitle>GCash Payment</IonTitle>
-              <IonButtons slot="end">
-                <IonButton onClick={() => setShowQRCode(false)}>Close</IonButton>
-              </IonButtons>
-            </IonToolbar>
-          </IonHeader>
-          <IonContent className="ion-padding">
-            <IonCard>
-              <IonCardContent>
-                <div className="qr-code-container">
-                  <IonImg
-                    src="/assets/gcash-qr.png"
-                    alt="GCash QR Code"
-                    className="qr-code-image"
-                  />
-                  <IonText>
-                    <p>Scan this QR code using your GCash app</p>
-                    <p>After payment, enter your reference number below</p>
-                  </IonText>
-                  <IonInput
-                    placeholder="Enter GCash Reference Number"
-                    value={referenceNumber}
-                    onIonChange={(e) => setReferenceNumber(e.detail.value!)}
-                    className="reference-input"
-                  />
-                </div>
-              </IonCardContent>
-            </IonCard>
-          </IonContent>
-        </IonModal>
       </IonContent>
 
       <IonFooter>
@@ -164,6 +145,7 @@ const Payment: React.FC = () => {
               <IonButton
                 className="footer-action-button"
                 onClick={handleContinue}
+                disabled={!paymentMethod}
               >
                 <IonIcon icon={chevronForwardCircle} slot="end" />
                 Continue to Review

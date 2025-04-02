@@ -54,43 +54,105 @@
   color: #666;
 }
 
+.gcash-modal {
+  --height: 100%;
+  --width: 100%;
+}
+
+.gcash-modal::part(content) {
+  --background: #ffffff;
+}
+
 .qr-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 20px;
+  background: #ffffff;
+  min-height: 100%;
+}
+
+.qr-details {
   text-align: center;
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+.qr-details h2 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #000;
+  margin-bottom: 8px;
+}
+
+.qr-details p {
+  font-size: 14px;
+  color: #666;
+  margin: 0;
+}
+
+.qr-image-wrapper {
+  width: 100%;
+  max-width: 300px;
+  margin: 20px auto;
+  padding: 20px;
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .qr-code-image {
-  width: 250px;
-  height: 250px;
-  margin: 20px auto;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.qr-container ion-text {
-  margin: 16px 0;
-}
-
-.qr-container ion-text p {
-  margin: 8px 0;
-  color: var(--ion-color-dark);
-}
-
-.qr-container ion-item {
   width: 100%;
-  max-width: 400px;
-  margin: 16px 0;
-  --background: var(--ion-color-light);
+  height: auto;
+  max-width: 250px;
+  object-fit: contain;
+}
+
+.qr-instructions {
+  font-size: 16px;
+  color: #666;
+  text-align: center;
+  margin: 20px 0;
+  padding: 0 20px;
+}
+
+.reference-number-section {
+  width: 100%;
+  max-width: 300px;
+  margin-top: 20px;
+  padding: 0 20px;
+}
+
+.reference-number-section ion-item {
+  --background: #f5f5f5;
   --border-radius: 8px;
+  --padding-start: 16px;
+  --padding-end: 16px;
+  margin-bottom: 16px;
+}
+
+.reference-number-section ion-label {
+  color: #333;
+  font-weight: 500;
+}
+
+.reference-number-section ion-input {
+  --padding-start: 0;
+  --placeholder-color: #999;
+  font-size: 16px;
 }
 
 .submit-reference-button {
   margin-top: 16px;
-  width: 100%;
-  max-width: 400px;
+  --background: var(--ion-color-primary);
+  --color: #ffffff;
+  --border-radius: 8px;
+  --box-shadow: none;
+  font-weight: 600;
 }
 
 /* Review page styles */
@@ -115,6 +177,33 @@
   color: var(--ion-color-dark);
   font-size: 1.2rem;
   margin: 0;
+}
+
+.payment-method-section {
+  margin: 20px 0;
+  border-top: 1px solid var(--ion-color-light);
+  border-bottom: 1px solid var(--ion-color-light);
+}
+
+.payment-method-section ion-item {
+  --padding-start: 0;
+  --inner-padding-end: 0;
+}
+
+.payment-method-section ion-icon {
+  font-size: 24px;
+  margin-right: 16px;
+}
+
+.payment-method-section h2 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.payment-method-section p {
+  margin: 4px 0 0;
+  color: var(--ion-color-medium);
 }
 
 /* Footer Styles */
@@ -157,13 +246,53 @@ ion-modal {
   --height: auto;
   --width: 90%;
   --max-width: 400px;
-  --border-radius: 8px;
-}
-
-ion-modal ion-header {
-  box-shadow: none;
+  --border-radius: 16px;
 }
 
 ion-modal ion-content {
-  --padding: 20px;
+  --background: #ffffff;
+}
+
+ion-modal ion-toolbar {
+  --background: transparent;
+}
+
+ion-modal ion-title {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+ion-modal .ion-padding {
+  padding: 16px;
+}
+
+/* Make sure modal content is scrollable */
+ion-modal ion-content::part(scroll) {
+  overflow-y: auto;
+}
+
+/* Ensure modal has proper height on mobile */
+@media screen and (max-width: 768px) {
+  ion-modal {
+    --height: auto;
+    --max-height: 90%;
+  }
+
+  .gcash-modal {
+    --height: 100%;
+    --width: 100%;
+  }
+
+  .qr-container {
+    padding: 16px;
+  }
+
+  .qr-image-wrapper {
+    max-width: 280px;
+    padding: 16px;
+  }
+
+  .qr-code-image {
+    max-width: 220px;
+  }
 }

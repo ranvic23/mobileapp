@@ -28,7 +28,7 @@ import {
   IonCardSubtitle,
   IonInput,
 } from "@ionic/react";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import CheckoutStepProgress from "../components/CheckoutStepProgress";
 import { useHistory } from "react-router-dom";
 import {
@@ -43,11 +43,11 @@ import {
   locationOutline,
   cashOutline,
   cardOutline,
+  close,
 } from "ionicons/icons";
 import { auth, db } from "../firebase-config";
 import { collection, addDoc, serverTimestamp, getDocs, query, where, deleteDoc, doc, updateDoc } from "firebase/firestore";
 import "./Review.css";
-import gcashQR from "/assets/gcash-qr.png";
 
 interface CartItem {
   id: string;
@@ -97,7 +97,12 @@ const Review: React.FC = () => {
         }
 
         // Get selected payment method from localStorage
-        const selectedPaymentMethod = localStorage.getItem("selectedPaymentMethod") || "cash";
+        const selectedPaymentMethod = localStorage.getItem("selectedPaymentMethod");
+        if (!selectedPaymentMethod) {
+          // If no payment method is selected, go back to payment selection
+          history.replace("/home/cart/schedule/payment");
+          return;
+        }
         setPaymentMethod(selectedPaymentMethod);
 
         const cartRef = collection(db, "customers", user.uid, "cart");
@@ -106,6 +111,12 @@ const Review: React.FC = () => {
           id: doc.id,
           ...doc.data(),
         })) as CartItem[];
+
+        if (items.length === 0) {
+          // If cart is empty, redirect to cart
+          history.replace("/home/cart");
+          return;
+        }
 
         setCartItems(items);
         
@@ -162,13 +173,13 @@ const Review: React.FC = () => {
       );
       await Promise.all(deletePromises);
 
+      // Clear payment method from localStorage
+      localStorage.removeItem("selectedPaymentMethod");
+
       if (paymentMethod === "gcash") {
         setShowQRCode(true);
       } else {
         setShowSuccessAlert(true);
-        setTimeout(() => {
-          history.push("/home/orders");
-        }, 1500);
       }
     } catch (error) {
       console.error("Error creating order:", error);
@@ -190,9 +201,6 @@ const Review: React.FC = () => {
 
       setShowQRCode(false);
       setShowSuccessAlert(true);
-      setTimeout(() => {
-        history.push("/home/orders");
-      }, 1500);
     } catch (error) {
       console.error("Error updating reference number:", error);
     }
@@ -231,7 +239,7 @@ const Review: React.FC = () => {
           <IonTitle className="title-toolbar">Review Order</IonTitle>
         </IonToolbar>
       </IonHeader>
-      <IonContent fullscreen>
+      <IonContent className="ion-padding">
         <CheckoutStepProgress currentStep={currentStep} />
 
         <div className="review-container">
@@ -243,7 +251,7 @@ const Review: React.FC = () => {
             <IonCardContent>
               <IonList>
                 {cartItems.map((item) => (
-                  <IonItem key={item.cartId || item.id}>
+                  <IonItem key={item.cartId || item.id} lines="full">
                     <IonLabel>
                       <h2>{item.productName || 'Unnamed Product'}</h2>
                       <p>Size: {item.productSize?.name || 'N/A'}</p>
@@ -261,8 +269,18 @@ const Review: React.FC = () => {
                 ))}
               </IonList>
 
+              <div className="payment-method-section">
+                <IonItem lines="full">
+                  <IonIcon icon={paymentMethod === "cash" ? cashOutline : cardOutline} slot="start" color="primary" />
+                  <IonLabel>
+                    <h2>Payment Method</h2>
+                    <p>{paymentMethod === "cash" ? "Cash on Pickup" : "GCash"}</p>
+                  </IonLabel>
+                </IonItem>
+              </div>
+
               <div className="order-total">
-                <IonText>
+                <IonText color="dark">
                   <h2>Total Amount: ₱{(orderTotal || 0).toLocaleString()}</h2>
                 </IonText>
               </div>
@@ -270,50 +288,68 @@ const Review: React.FC = () => {
           </IonCard>
         </div>
 
-        {/* GCash QR Code Modal */}
-        <IonModal isOpen={showQRCode} onDidDismiss={() => setShowQRCode(false)}>
+        {/* Update the GCash QR Code Modal */}
+        <IonModal 
+          isOpen={showQRCode} 
+          onDidDismiss={() => setShowQRCode(false)}
+          className="gcash-modal"
+        >
           <IonHeader>
             <IonToolbar>
-              <IonTitle>GCash Payment</IonTitle>
-              <IonButtons slot="end">
-                <IonButton onClick={() => setShowQRCode(false)}>Close</IonButton>
+              <IonButtons slot="start">
+                <IonButton onClick={() => setShowQRCode(false)}>
+                  <IonIcon icon={close} />
+                </IonButton>
               </IonButtons>
+              <IonTitle>GCash Payment</IonTitle>
             </IonToolbar>
           </IonHeader>
-          <IonContent className="ion-padding">
+          
+          <IonContent>
             <div className="qr-container">
-              <img
-                src="/assets/gcash-qr.png"
-                alt="GCash QR Code"
-                className="qr-code-image"
-                onError={(e) => {
-                  console.error("Error loading QR code image");
-                  const target = e.target as HTMLImageElement;
-                  target.onerror = null;
-                  target.src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI2VlZSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTYiIGZpbGw9IiM5OTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5RUiBDb2RlIE5vdCBGb3VuZDwvdGV4dD48L3N2Zz4=';
-                }}
-              />
-              <IonText>
+              <div className="qr-details">
                 <h2>Total Amount: ₱{orderTotal.toLocaleString()}</h2>
                 <p>Order ID: {orderId}</p>
-                <p>Please scan the QR code to complete your payment</p>
-              </IonText>
-              <IonItem>
-                <IonLabel position="stacked">Enter Reference Number</IonLabel>
-                <IonInput
-                  value={referenceNumber}
-                  onIonChange={e => setReferenceNumber(e.detail.value!)}
-                  placeholder="Enter your GCash reference number"
+              </div>
+              
+              <div className="qr-image-wrapper">
+                <IonImg
+                  src="/assets/gcash-qr.png"
+                  alt="GCash QR Code"
+                  className="qr-code-image"
+                  onIonError={() => {
+                    console.error("Failed to load QR code image");
+                    const imgElement = document.querySelector('.qr-code-image') as HTMLIonImgElement;
+                    if (imgElement) {
+                      imgElement.src = "https://via.placeholder.com/300x300?text=GCash+QR+Code";
+                    }
+                  }}
                 />
-              </IonItem>
-              <IonButton
-                expand="block"
-                onClick={handleReferenceSubmit}
-                disabled={!referenceNumber}
-                className="submit-reference-button"
-              >
-                Submit Reference Number
-              </IonButton>
+              </div>
+              
+              <p className="qr-instructions">Please scan the QR code to complete your payment</p>
+              
+              <div className="reference-number-section">
+                <IonItem>
+                  <IonLabel position="stacked">Enter Reference Number</IonLabel>
+                  <IonInput
+                    type="text"
+                    inputmode="text"
+                    value={referenceNumber}
+                    onIonChange={e => setReferenceNumber(e.detail.value!)}
+                    placeholder="Enter your GCash reference number"
+                  />
+                </IonItem>
+                
+                <IonButton
+                  expand="block"
+                  onClick={handleReferenceSubmit}
+                  disabled={!referenceNumber}
+                  className="submit-reference-button"
+                >
+                  Submit Reference Number
+                </IonButton>
+              </div>
             </div>
           </IonContent>
         </IonModal>
@@ -383,7 +419,6 @@ const Review: React.FC = () => {
                 ) : (
                   <>
                     <IonIcon icon={checkmarkCircleSharp} slot="start" />
-                    <IonIcon icon={chevronForwardCircle} slot="end" />
                     Confirm Order
                   </>
                 )}

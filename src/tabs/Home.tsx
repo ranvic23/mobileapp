@@ -298,16 +298,10 @@ const Home: React.FC = () => {
                       button
                     >
                       <div className="product-item">
-                        {/* Product Image */}
-                        {/* <IonImg
-                          className="product-img"
-                          src={product.imageURL}
-                        /> */}
                         <div className="product-img">
                           <IonImg src={product.imageURL} />
                         </div>
-                        {/* Product Details */}
-                        {/* <IonLabel className="product-details">
+                        <IonLabel className="product-details">
                           <IonCardHeader className="product-header">
                             <IonCardTitle className="home-product-name">
                               {product.name}
@@ -316,7 +310,7 @@ const Home: React.FC = () => {
                               {product.description}
                             </IonCardSubtitle>
                           </IonCardHeader>
-                        </IonLabel> */}
+                        </IonLabel>
                       </div>
                     </IonCard>
                   </IonCol>
